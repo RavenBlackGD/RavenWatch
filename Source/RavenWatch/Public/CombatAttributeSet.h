@@ -43,4 +43,22 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat|Movement")
 	FAttribute MovementSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Offense")
+	FAttribute FlatFireDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Offense")
+	FAttribute FlatColdDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Offense")
+	FAttribute FlatLightningDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Offense")
+	FAttribute IncreasedFireDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Offense")
+	FAttribute IncreasedColdDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Offense")
+	FAttribute IncreasedLightningDamage;
 };

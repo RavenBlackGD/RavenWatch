@@ -54,6 +54,24 @@ namespace
 		case EEquipmentStat::CriticalDamage:
 			return { UCombatAttributeSet::StaticClass(), TEXT("CriticalDamage") };
 
+		case EEquipmentStat::FlatFireDamage:
+			return { UCombatAttributeSet::StaticClass(), TEXT("FlatFireDamage") };
+
+		case EEquipmentStat::FlatColdDamage:
+			return { UCombatAttributeSet::StaticClass(), TEXT("FlatColdDamage") };
+
+		case EEquipmentStat::FlatLightningDamage:
+			return { UCombatAttributeSet::StaticClass(), TEXT("FlatLightningDamage") };
+
+		case EEquipmentStat::IncreasedFireDamage:
+			return { UCombatAttributeSet::StaticClass(), TEXT("IncreasedFireDamage") };
+
+		case EEquipmentStat::IncreasedColdDamage:
+			return { UCombatAttributeSet::StaticClass(), TEXT("IncreasedColdDamage") };
+
+		case EEquipmentStat::IncreasedLightningDamage:
+			return { UCombatAttributeSet::StaticClass(), TEXT("IncreasedLightningDamage") };
+
 		default:
 			return { nullptr, NAME_None };
 		}

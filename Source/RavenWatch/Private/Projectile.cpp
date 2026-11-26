@@ -15,6 +15,8 @@ AProjectile::AProjectile()
 
     DestroyTime = 3.0f;
     Damage = 10.0f;
+    DamageBreakdown.PhysicalDamage = Damage;
+    DamageBreakdown.Damage = Damage;
     CollisionScale = FVector(0.25f);
     MeshScale = FVector(0.15f);
     GravityScale = 0.0f;
@@ -72,11 +74,37 @@ AProjectile::AProjectile()
     }
 }
 
+
 void AProjectile::InitializeDamage(float InDamage, bool bInCriticalHit)
 {
     Damage = FMath::Max(0.0f, InDamage);
     bCriticalHit = bInCriticalHit;
+
+    // Legacy damage is treated entirely as physical.
+    DamageBreakdown = FCombatDamageResult();
+    DamageBreakdown.Damage = Damage;
+    DamageBreakdown.PhysicalDamage = Damage;
+    DamageBreakdown.bWasCritical = bCriticalHit;
 }
+
+void AProjectile::InitializeDamage(const FCombatDamageResult& InDamage)
+{
+    DamageBreakdown = InDamage;
+
+    DamageBreakdown.PhysicalDamage = FMath::Max(0.0f, DamageBreakdown.PhysicalDamage);
+
+    DamageBreakdown.FireDamage = FMath::Max(0.0f, DamageBreakdown.FireDamage);
+
+    DamageBreakdown.ColdDamage = FMath::Max(0.0f, DamageBreakdown.ColdDamage);
+
+    DamageBreakdown.LightningDamage = FMath::Max(0.0f, DamageBreakdown.LightningDamage);
+
+    Damage = DamageBreakdown.PhysicalDamage + DamageBreakdown.FireDamage + DamageBreakdown.ColdDamage + DamageBreakdown.LightningDamage;
+
+    DamageBreakdown.Damage = Damage;
+    bCriticalHit = DamageBreakdown.bWasCritical;
+}
+
 
 // Called when the game starts or when spawned
 void AProjectile::BeginPlay()
@@ -160,7 +188,16 @@ void AProjectile::HandleOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
     UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, nullptr);
 
-    const FString DamageMessage = FString::Printf(TEXT("%s | Damage: %.1f | Critical: %s"), *OtherActor->GetName(), Damage, bCriticalHit ? TEXT("YES") : TEXT("NO"));
+    const FString DamageMessage = FString::Printf(
+        TEXT("%s | Total: %.1f | Phys: %.1f | Fire: %.1f | Cold: %.1f | Lightning: %.1f | Crit: %s"),
+        *OtherActor->GetName(),
+        Damage,
+        DamageBreakdown.PhysicalDamage,
+        DamageBreakdown.FireDamage,
+        DamageBreakdown.ColdDamage,
+        DamageBreakdown.LightningDamage,
+        bCriticalHit ? TEXT("YES") : TEXT("NO")
+    );
 
     UKismetSystemLibrary::PrintString(this, DamageMessage, true, true, bCriticalHit ? FLinearColor::Yellow : FLinearColor::White, 3.0f);
 

@@ -162,7 +162,7 @@ void ABaseRifle::Attack()
         {
             const FCombatDamageResult AttackResult = Combat->CalculateAttack(10.0f);
 
-            Projectile->InitializeDamage(AttackResult.Damage, AttackResult.bWasCritical);
+            Projectile->InitializeDamage(AttackResult);
         }
     }
 

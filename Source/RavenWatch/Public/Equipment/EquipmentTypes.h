@@ -37,7 +37,15 @@ enum class EEquipmentStat : uint8
 	AttackDamage,
 	AttackSpeed,
 	CriticalChance,
-	CriticalDamage
+	CriticalDamage,
+
+	FlatFireDamage,
+	FlatColdDamage,
+	FlatLightningDamage,
+
+	IncreasedFireDamage,
+	IncreasedColdDamage,
+	IncreasedLightningDamage
 };
 
 USTRUCT(BlueprintType)

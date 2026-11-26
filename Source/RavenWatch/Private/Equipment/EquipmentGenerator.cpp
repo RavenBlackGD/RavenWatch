@@ -54,6 +54,12 @@ namespace
 
 		AddModifier(EEquipmentStat::AttackDamage, EAffixType::Prefix, 5, 20, {EEquipmentSlot::Weapon});
 
+		AddModifier(EEquipmentStat::FlatFireDamage, EAffixType::Prefix, 3, 15, AllSlots);
+
+		AddModifier(EEquipmentStat::FlatColdDamage, EAffixType::Prefix, 3, 15, AllSlots);
+
+		AddModifier(EEquipmentStat::FlatLightningDamage, EAffixType::Prefix, 3, 15, AllSlots);
+
 		// ---- SUFFIXES ----
 
 		AddModifier(EEquipmentStat::MovementSpeed, EAffixType::Suffix, 1, 5, AllSlots);
@@ -65,6 +71,12 @@ namespace
 		AddModifier(EEquipmentStat::CriticalDamage, EAffixType::Suffix, 5, 20, AllSlots);
 
 		AddModifier(EEquipmentStat::AttackDamage, EAffixType::Suffix, 2, 10, AllSlots);
+
+		AddModifier(EEquipmentStat::IncreasedFireDamage, EAffixType::Suffix, 5, 25, AllSlots);
+
+		AddModifier(EEquipmentStat::IncreasedColdDamage, EAffixType::Suffix, 5, 25, AllSlots);
+
+		AddModifier(EEquipmentStat::IncreasedLightningDamage, EAffixType::Suffix, 5, 25, AllSlots);
 
 		return Pool;
 	}
@@ -113,19 +125,31 @@ FEquipmentInstance UEquipmentGenerator::GenerateEquipment(EEquipmentSlot Slot, F
 		}
 	}
 
-	if (!PrefixPool.IsEmpty())
+
+	constexpr int32 MaxPrefixes = 2;
+	constexpr int32 MaxSuffixes = 2;
+
+	// Roll up to 2 distinct prefixes.
+	for (int32 i = 0; i < MaxPrefixes && !PrefixPool.IsEmpty(); ++i)
 	{
-		int32 Index = FMath::RandRange(0, PrefixPool.Num() - 1);
+		const int32 Index = FMath::RandRange(0, PrefixPool.Num() - 1);
 
 		Item.Modifiers.Add(RollModifier(PrefixPool[Index]));
+
+		// Prevent the same modifier from being rolled twice.
+		PrefixPool.RemoveAtSwap(Index);
 	}
 
-	if (!SuffixPool.IsEmpty())
+	// Roll up to 2 distinct suffixes.
+	for (int32 i = 0; i < MaxSuffixes && !SuffixPool.IsEmpty(); ++i)
 	{
-		int32 Index = FMath::RandRange(0, SuffixPool.Num() - 1);
+		const int32 Index = FMath::RandRange(0, SuffixPool.Num() - 1);
 
 		Item.Modifiers.Add(RollModifier(SuffixPool[Index]));
+
+		SuffixPool.RemoveAtSwap(Index);
 	}
+
 
 	return Item;
 }

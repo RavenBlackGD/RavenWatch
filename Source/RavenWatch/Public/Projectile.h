@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GenericTeamAgentInterface.h"
+#include "CombatComponent.h"
 #include "Projectile.generated.h"
 
 /**
@@ -21,6 +22,8 @@ public:
     AProjectile();
 
     virtual void InitializeDamage(float InDamage, bool bInCriticalHit);
+
+    virtual void InitializeDamage(const FCombatDamageResult& InDamage);
 
 protected:
     // Called when the game starts or when spawned
@@ -85,5 +88,7 @@ private:
 
     // The shooter's team, saved when fired so it still counts if the shooter dies mid-flight
     FGenericTeamId ShooterTeam = FGenericTeamId::NoTeam;
+
+    FCombatDamageResult DamageBreakdown;
 
 };

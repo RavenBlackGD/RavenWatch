@@ -15,6 +15,18 @@ struct FCombatDamageResult
 	float Damage = 0.0f;
 
 	UPROPERTY(BlueprintReadOnly)
+	float PhysicalDamage = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
+	float FireDamage = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
+	float ColdDamage = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
+	float LightningDamage = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
 	bool bWasCritical = false;
 };
 

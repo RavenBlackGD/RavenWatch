@@ -15,5 +15,11 @@ UCombatAttributeSet::UCombatAttributeSet()
 	CriticalChance.Initialize(5.0f);
 	CriticalDamage.Initialize(150.0f);
 	MovementSpeed.Initialize(100.0f);
+	FlatFireDamage.Initialize(0.0f);
+	FlatColdDamage.Initialize(0.0f);
+	FlatLightningDamage.Initialize(0.0f);
+	IncreasedFireDamage.Initialize(0.0f);
+	IncreasedColdDamage.Initialize(0.0f);
+	IncreasedLightningDamage.Initialize(0.0f);
 }
 

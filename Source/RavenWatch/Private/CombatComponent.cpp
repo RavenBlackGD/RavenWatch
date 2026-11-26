@@ -78,39 +78,79 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+
 FCombatDamageResult UCombatComponent::CalculateAttack(float DefaultDamage) const
 {
-	FCombatDamageResult Result;
+    FCombatDamageResult Result;
 
-	float AttackDamage = DefaultDamage;
-	float CriticalChance = 0.0f;
-	float CriticalDamage = 150.0f;
+    float AttackDamage = DefaultDamage;
+    float CriticalChance = 0.0f;
+    float CriticalDamage = 150.0f;
 
-	if (const AActor* Owner = GetOwner())
-	{
-		if (const UAttributeSystem* Attributes = Owner->FindComponentByClass<UAttributeSystem>())
-		{
-			Attributes->GetAttributeValue(UCombatAttributeSet::StaticClass(), TEXT("DamageAmount"), AttackDamage);
+    float FlatFire = 0.0f;
+    float FlatCold = 0.0f;
+    float FlatLightning = 0.0f;
 
-			Attributes->GetAttributeValue(UCombatAttributeSet::StaticClass(), TEXT("CriticalChance"), CriticalChance);
+    float IncreasedFire = 0.0f;
+    float IncreasedCold = 0.0f;
+    float IncreasedLightning = 0.0f;
 
-			Attributes->GetAttributeValue(UCombatAttributeSet::StaticClass(), TEXT("CriticalDamage"), CriticalDamage);
-		}
-	}
+    if (const AActor* Owner = GetOwner())
+    {
+        if (const UAttributeSystem* Attributes = Owner->FindComponentByClass<UAttributeSystem>())
+        {
+            const auto Combat = UCombatAttributeSet::StaticClass();
 
-	Result.Damage = FMath::Max(0.0f, AttackDamage);
+            Attributes->GetAttributeValue(Combat, TEXT("DamageAmount"), AttackDamage);
 
-	const float ClampedCritChance = FMath::Clamp(CriticalChance, 0.0f, 100.0f);
+            Attributes->GetAttributeValue(Combat, TEXT("CriticalChance"), CriticalChance);
 
-	Result.bWasCritical = FMath::FRand() < (ClampedCritChance / 100.0f);
+            Attributes->GetAttributeValue(Combat, TEXT("CriticalDamage"), CriticalDamage);
 
-	if (Result.bWasCritical)
-	{
-		Result.Damage *= FMath::Max(0.0f, CriticalDamage) / 100.0f;
-	}
+            Attributes->GetAttributeValue(Combat, TEXT("FlatFireDamage"), FlatFire);
 
-	return Result;
+            Attributes->GetAttributeValue(Combat, TEXT("FlatColdDamage"), FlatCold);
+
+            Attributes->GetAttributeValue(Combat, TEXT("FlatLightningDamage"), FlatLightning);
+
+            Attributes->GetAttributeValue(Combat, TEXT("IncreasedFireDamage"), IncreasedFire);
+
+            Attributes->GetAttributeValue(Combat, TEXT("IncreasedColdDamage"), IncreasedCold);
+
+            Attributes->GetAttributeValue(Combat, TEXT("IncreasedLightningDamage"), IncreasedLightning);
+        }
+    }
+
+    // Base damage is currently treated as physical damage.
+    Result.PhysicalDamage = FMath::Max(0.0f, AttackDamage);
+
+    // Flat elemental damage scales with its respective increase.
+    Result.FireDamage = FMath::Max(0.0f, FlatFire * (1.0f + IncreasedFire / 100.0f));
+
+    Result.ColdDamage = FMath::Max(0.0f, FlatCold * (1.0f + IncreasedCold / 100.0f));
+
+    Result.LightningDamage = FMath::Max(0.0f, FlatLightning * (1.0f + IncreasedLightning / 100.0f));
+
+    // Roll critical strike once for the entire hit.
+    const float ClampedCritChance = FMath::Clamp(CriticalChance, 0.0f, 100.0f);
+
+    Result.bWasCritical = FMath::FRand() < (ClampedCritChance / 100.0f);
+
+    if (Result.bWasCritical)
+    {
+        const float CritMultiplier = FMath::Max(0.0f, CriticalDamage) / 100.0f;
+
+        Result.PhysicalDamage *= CritMultiplier;
+        Result.FireDamage *= CritMultiplier;
+        Result.ColdDamage *= CritMultiplier;
+        Result.LightningDamage *= CritMultiplier;
+    }
+
+    Result.Damage = Result.PhysicalDamage + Result.FireDamage + Result.ColdDamage + Result.LightningDamage;
+
+    return Result;
 }
+
 
 float UCombatComponent::GetAttackInterval(float BaseInterval) const
 {
